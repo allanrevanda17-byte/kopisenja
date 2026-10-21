@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Digital - Kafe Senja</title>
+    <style>
+        /* === DESAIN VISUAL (CSS) === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4ece1; /* Warna latar krem ala kopi */ color: #4a3b32; padding-bottom: 80px; }
+
+        header { background-color: #6f4e37; /* Warna cokelat kopi */ color: white; padding: 25px 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        header h1 { font-size: 24px; margin-bottom: 5px; }
+        header p { font-size: 14px; opacity: 0.9; }
+
+        .kategori-container { display: flex; justify-content: flex-start; gap: 10px; padding: 15px 20px; overflow-x: auto; white-space: nowrap; }
+        .kategori-container::-webkit-scrollbar { display: none; }
+        
+        .btn-kategori { border: 1px solid #6f4e37; padding: 8px 18px; border-radius: 20px; background-color: transparent; color: #6f4e37; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-kategori.aktif { background-color: #6f4e37; color: white; }
+
+        .menu-container { display: grid; grid-template-columns: 1fr; gap: 15px; padding: 10px 20px; max-width: 600px; margin: auto; }
+
+        .kartu-menu { background: white; border-radius: 12px; padding: 15px; display: flex; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .kartu-menu img { width: 85px; height: 85px; border-radius: 10px; object-fit: cover; }
+        .info-menu { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .info-menu h3 { font-size: 16px; margin-bottom: 4px; color: #3e2723; }
+        .info-menu p { font-size: 12px; color: #795548; margin-bottom: 8px; line-height: 1.4; }
+        
+        .harga-tambah { display: flex; justify-content: space-between; align-items: center; }
+        .harga { font-weight: bold; color: #d84315; font-size: 14px; }
+        .btn-tambah { background-color: #6f4e37; color: white; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s; }
+        .btn-tambah:active { background-color: #4e342e; transform: scale(0.95); }
+
+        /* Keranjang Belanja di Bawah */
+        .keranjang-container { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-top-left-radius: 15px; border-top-right-radius: 15px; z-index: 100; }
+        .sembunyi { transform: translateY(150%); }
+        .info-keranjang { display: flex; flex-direction: column; }
+        #total-item { font-size: 12px; color: #795548; font-weight: bold; }
+        #total-harga { font-size: 18px; font-weight: bold; color: #d84315; }
+        #btn-pesan { background-color: #25D366; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>Kafe Senja ☕</h1>
+        <p>Rasakan hangatnya senja di setiap tegukan.</p>
+    </header>
+
+    <!-- Tombol Kategori -->
+    <div class="kategori-container">
+        <button class="btn-kategori aktif" onclick="filterMenu('semua')">Semua</button>
+        <button class="btn-kategori" onclick="filterMenu('kopi')">Kopi</button>
+        <button class="btn-kategori" onclick="filterMenu('non-kopi')">Non-Kopi</button>
+        <button class="btn-kategori" onclick="filterMenu('camilan')">Camilan</button>
+    </div>
+
+    <!-- Daftar Menu -->
+    <main id="daftar-menu" class="menu-container">
+        <!-- Menu akan di-generate otomatis oleh JavaScript -->
+    </main>
+
+    <!-- Keranjang Belanja -->
+    <div id="keranjang" class="keranjang-container sembunyi">
+        <div class="info-keranjang">
+            <span id="total-item">0 Item</span>
+            <span id="total-harga">Rp 0</span>
+        </div>
+        <button id="btn-pesan" onclick="kirimKeWhatsApp()">
+            Kirim Pesanan 💬
+        </button>
+    </div>
+
+    <script>
+        // === LOGIKA APLIKASI (JAVASCRIPT) ===
+
+        // Data Menu Kafe Senja
+        const dataMenu = [
+            // Kategori KOPI
+            { id: 1, nama: "Kopi Hitam (Tubruk)", kategori: "kopi", harga: 12000, deskripsi: "Kopi hitam pekat dari biji robusta pilihan khas Nusantara.", gambar: "https://images.unsplash.com/photo-1559525839-b184a4d698c7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" },
+            { id: 2, nama: "Cappuccino Hangat", kategori: "kopi", harga: 22000, deskripsi: "Espresso klasik dengan paduan susu steam dan foam tebal.", gambar: "https://images.unsplash.com/photo-1534778101976-62847782c213?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" },
+            { id: 3, nama: "Es Kopi Susu Senja", kategori: "kopi", harga: 18000, deskripsi: "Menu andalan! Kopi espresso, susu creamy, dan gula aren asli.", gambar: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" },
+            { id: 4, nama: "Cafe Latte", kategori: "kopi", harga: 24000, deskripsi: "Kopi dengan lebih banyak susu, rasa lebih lembut di lambung.", gambar: "
